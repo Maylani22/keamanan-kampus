@@ -1,0 +1,21 @@
+{
+    "name": "lenovo/keamanan",
+    "description": "Sistem Informasi Keamanan Kampus",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Maylani22",
+            "email": "if24.maylani@mhs.ubpkarawang.ac.id"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^7.0"
+    },
+    "autoload": {
+        "classmap": ["models/","lib/","config/"]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

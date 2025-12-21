@@ -1,0 +1,105 @@
+:root {
+    --primary: #2d3436;
+    --secondary: #636e72;
+    --accent: #0984e3;
+    --success: #00b894;
+    --warning: #fdcb6e;
+    --danger: #d63031;
+    --light: #f5f6fa;
+    --card-bg: #ffffff;
+    --shadow: 0 2px 15px rgba(0,0,0,0.08);
+}
+    
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    padding-top: 70px;
+}
+    
+/* Navbar Custom */
+
+    
+#heatmapContainer {
+    height: 400px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.hotspot-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+}
+
+.pattern-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.progress-thin {
+    height: 8px;
+}   
+
+.notification-item {
+    border-left: 4px solid transparent;
+    transition: all 0.2s;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-unread {
+    border-left-color: #0d6efd;
+    background-color: #f0f7ff;
+}
+
+.notification-read {
+    border-left-color: #6c757d;
+    background-color: #ffffff;
+}
+
+.badge-unread {
+    animation: pulse 2s infinite;
+}
+
+.notification-icon {
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+.notification-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.list-group-flush .list-group-item {
+    border-color: rgba(0,0,0,.05);
+}
+
+.nav-tabs .nav-link {
+    color: #6c757d;
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border: none;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    border-bottom: 2px solid #0d6efd;
+    background-color: transparent;
+}
+
+.tab-content {
+    padding-top: 0.5rem;
+}
+
+/* Progress bar kecil */
+.progress-sm {
+    height: 6px;
+}
+
