@@ -2,12 +2,12 @@
 require_once '../config/constants.php';
 require_once '../config/database.php';
 
-// Start session
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Redirect if already logged in
+
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['user_role'] === ROLE_ADMIN) {
         header('Location: dashboard_admin.php');
@@ -29,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
     
-    // Validation
     if (empty($name) || empty($email) || empty($password)) {
         $error = 'Semua field harus diisi';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -39,20 +38,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $confirm_password) {
         $error = 'Password tidak cocok';
     } else {
-        // Check if email exists
         $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         
         if ($stmt->fetch()) {
             $error = 'Email sudah terdaftar';
         } else {
-            // Create new user
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $db->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'mahasiswa')");
             
             if ($stmt->execute([$name, $email, $hashed_password])) {
                 $success = 'Registrasi berhasil! Silakan login.';
-                // Clear form
                 $_POST = [];
             } else {
                 $error = 'Gagal mendaftar. Silakan coba lagi.';
@@ -192,7 +188,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     <script>
-        // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
             const password = document.getElementById('password');
             const icon = this.querySelector('i');

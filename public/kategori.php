@@ -127,7 +127,6 @@ if ($action === 'list') {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        /* ========== NAVBAR STYLES ========== */
         .navbar-custom {
             background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -335,7 +334,6 @@ if ($action === 'list') {
     </nav>
 
     <div class="container mt-4">
-        <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>
                 <i class="bi bi-tags"></i> 
@@ -348,7 +346,6 @@ if ($action === 'list') {
             </div>
         </div>
 
-        <!-- Messages -->
         <?php if ($message): ?>
             <div class="alert alert-success alert-dismissible fade show">
                 <?= $message ?>
@@ -363,9 +360,7 @@ if ($action === 'list') {
             </div>
         <?php endif; ?>
 
-        <!-- Content -->
         <?php if ($action === 'create' || $action === 'edit'): ?>
-            <!-- Form Create/Edit -->
             <div class="card">
                 <div class="card-body">
                     <form method="POST">
@@ -398,7 +393,6 @@ if ($action === 'list') {
             </div>
 
         <?php else: ?>
-            <!-- List Categories -->
             <div class="card">
                 <div class="card-header d-flex justify-content-end mb-3">
                     <a href="kategori.php?action=create" class="btn btn-primary btn-sm">
@@ -480,7 +474,6 @@ if ($action === 'list') {
         <?php endif; ?>
     </div>
 
-    <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -503,7 +496,6 @@ if ($action === 'list') {
         </div>
     </div>
 
-    <!-- Cannot Delete Info Modal -->
     <div class="modal fade" id="cannotDeleteModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">

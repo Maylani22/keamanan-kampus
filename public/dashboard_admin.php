@@ -17,7 +17,6 @@ $user = $auth->getCurrentUser();
 $laporanModel = new Laporan($db);
 $kategoriModel = new Kategori($db);
 
-// Get stats
 $stats = $laporanModel->getStats();
 $categories = $kategoriModel->getAll();
 $recentLaporans = array_slice($stats['recent'], 0, 5);
@@ -26,7 +25,6 @@ $stmt = $db->prepare("SELECT COUNT(*) as count FROM notifikasi WHERE user_id = ?
 $stmt->execute([$user['id']]);
 $unread_count = $stmt->fetch()['count'];
 
-// Count pending reports
 $pendingCount = 0;
 foreach ($stats['by_status'] as $status) {
     if ($status['status'] === STATUS_PENDING) {

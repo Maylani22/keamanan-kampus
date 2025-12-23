@@ -13,7 +13,6 @@ $db = $database->connect();
 $auth = new Auth();
 $user = $auth->getCurrentUser();
 
-// Hanya mahasiswa yang bisa akses
 if ($auth->isAdmin()) {
     header('Location: laporan_admin.php');
     exit;
@@ -22,12 +21,10 @@ if ($auth->isAdmin()) {
 $laporanModel = new Laporan($db);
 $kategoriModel = new Kategori($db);
 
-// AMBIL DATA NOTIFIKASI (TAMBAHKAN INI)
 $stmt = $db->prepare("SELECT COUNT(*) as count FROM notifikasi WHERE user_id = ? AND status = 'unread'");
 $stmt->execute([$user['id']]);
 $unread_count = $stmt->fetch()['count'];
 
-// 📊 GET DATA STATISTIK
 $laporans = $laporanModel->getByUser($user['id']);
 $totalLaporans = count($laporans);
 $pendingCount = 0;
@@ -77,7 +74,6 @@ $recentLaporans = array_slice($laporans, 0, 5);
             margin-bottom: 0.5rem;
         }
 
-        /* ========== NAVBAR STYLES ========== */
         .navbar-custom {
             background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);

@@ -1,11 +1,9 @@
 <?php
-// public/notifikasi.php - Halaman Notifikasi
 
 require_once '../config/constants.php';
 require_once '../lib/auth.php';
 require_once '../lib/functions.php';
 
-// Check login
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -24,13 +22,11 @@ $user = $auth->getCurrentUser();
 $message = '';
 $error = '';
 
-// Handle mark as read (SINGLE notifikasi)
 if (isset($_GET['mark_read'])) {
     $notif_id = intval($_GET['mark_read']);
     $stmt = $db->prepare("UPDATE notifikasi SET status = 'read' WHERE id = ? AND user_id = ?");
     if ($stmt->execute([$notif_id, $user['id']])) {
         $message = 'Notifikasi ditandai sebagai dibaca';
-        // Redirect untuk menghindari resubmission
         header('Location: notifikasi.php?success=read');
         exit;
     } else {
@@ -38,12 +34,11 @@ if (isset($_GET['mark_read'])) {
     }
 }
 
-// Handle mark all as read (SEMUA notifikasi)
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_all_read'])) {
     $stmt = $db->prepare("UPDATE notifikasi SET status = 'read' WHERE user_id = ? AND status = 'unread'");
     if ($stmt->execute([$user['id']])) {
         $message = 'Semua notifikasi ditandai sebagai dibaca';
-        // Redirect untuk menghindari resubmission
         header('Location: notifikasi.php?success=all_read');
         exit;
     } else {
@@ -51,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_all_read'])) {
     }
 }
 
-// Success messages from redirect
 if (isset($_GET['success'])) {
     if ($_GET['success'] === 'read') {
         $message = 'Notifikasi ditandai sebagai dibaca';
@@ -60,7 +54,6 @@ if (isset($_GET['success'])) {
     }
 }
 
-// Get notifications
 $stmt = $db->prepare("
     SELECT n.*, l.title as laporan_title 
     FROM notifikasi n
@@ -72,12 +65,10 @@ $stmt = $db->prepare("
 $stmt->execute([$user['id']]);
 $notifications = $stmt->fetchAll();
 
-// Count unread
 $stmt = $db->prepare("SELECT COUNT(*) as count FROM notifikasi WHERE user_id = ? AND status = 'unread'");
 $stmt->execute([$user['id']]);
 $unread_count = $stmt->fetch()['count'];
 
-// Count total
 $total_count = count($notifications);
 ?>
 <!DOCTYPE html>
@@ -89,7 +80,6 @@ $total_count = count($notifications);
     <?php include 'header.php'; ?>
     <link rel="stylesheet" href="style.css">
     <style>
-          /* ========== NAVBAR STYLES ========== */
         .navbar-custom {
             background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -306,7 +296,6 @@ $total_count = count($notifications);
     </nav>
 
     <div class="container mt-4">
-        <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2><i class="bi bi-bell"></i> Notifikasi</h2>
@@ -333,7 +322,6 @@ $total_count = count($notifications);
             </div>
         </div>
 
-        <!-- Messages -->
         <?php if ($message): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="bi bi-check-circle me-2"></i>
@@ -350,7 +338,6 @@ $total_count = count($notifications);
             </div>
         <?php endif; ?>
 
-        <!-- Notifications List -->
         <div class="card shadow-sm">
             <div class="card-header bg-white border-bottom">
                 <div class="d-flex justify-content-between align-items-center">
@@ -374,7 +361,6 @@ $total_count = count($notifications);
                     <div class="list-group list-group-flush">
                         <?php foreach ($notifications as $notif): ?>
                             <?php 
-                            // Tentukan ikon berdasarkan tipe notifikasi
                             $icon = 'bi-bell';
                             $icon_color = 'text-primary';
                             
@@ -460,14 +446,12 @@ $total_count = count($notifications);
     </div>
     
     <script>
-        // Konfirmasi mark all as read
         document.getElementById('markAllForm')?.addEventListener('submit', function(e) {
             if (!confirm('Apakah Anda yakin ingin menandai SEMUA notifikasi sebagai dibaca?')) {
                 e.preventDefault();
             }
         });
 
-        // Konfirmasi mark single as read (optional, bisa langsung)
         document.querySelectorAll('a[href*="mark_read="]').forEach(link => {
             link.addEventListener('click', function(e) {
                 if (!confirm('Tandai notifikasi ini sebagai dibaca?')) {
@@ -476,13 +460,11 @@ $total_count = count($notifications);
             });
         });
 
-        // Auto-scroll ke notifikasi pertama yang belum dibaca
         document.addEventListener('DOMContentLoaded', function() {
             const firstUnread = document.querySelector('.notification-unread');
             if (firstUnread) {
                 setTimeout(() => {
                     firstUnread.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Tambahkan efek highlight
                     firstUnread.style.boxShadow = '0 0 15px rgba(13, 110, 253, 0.3)';
                     setTimeout(() => {
                         firstUnread.style.boxShadow = '';
@@ -491,11 +473,10 @@ $total_count = count($notifications);
             }
         });
         
-        // Auto-refresh jika ada notifikasi belum dibaca (setiap 60 detik)
         <?php if ($unread_count > 0): ?>
         setTimeout(function() {
             window.location.reload();
-        }, 60000); // 60 detik
+        }, 60000); 
         <?php endif; ?>
     </script>
 </body>

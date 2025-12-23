@@ -1,5 +1,5 @@
 <?php
-//Analytics
+
 class AnalyticsService {
     private $db;
     
@@ -7,9 +7,7 @@ class AnalyticsService {
         $this->db = $database;
     }
     
-    // ================ METHOD UMUM YANG DIGUNAKAN OLEH SEMUA ROLE ================
-    
-    // 1. Data frekuensi per bulan
+    // Data frekuensi per bulan
     public function getMonthlyData($months = 6) {
         $query = "
             SELECT 
@@ -27,7 +25,7 @@ class AnalyticsService {
         return $stmt->fetchAll();
     }
     
-    // 2. Area rawan/hotspots
+    // Area rawan/hotspots
     public function getHotspots($limit = 10, $months = null) {
         $where_clause = $months ? "WHERE l.created_at >= DATE_SUB(NOW(), INTERVAL ? MONTH)" : "";
         $params = $months ? [$months] : [];
@@ -62,7 +60,7 @@ class AnalyticsService {
         return $stmt->fetchAll();
     }
     
-    // 3. Statistik umum
+    // Statistik 
     public function getGeneralStats($months = 6) {
         // Data per bulan untuk statistik
         $monthly_counts = $this->getMonthlyData($months);
@@ -87,7 +85,7 @@ class AnalyticsService {
         ];
     }
     
-    // 4. Pola per jam
+    // Pola per jam
     public function getHourPattern($months = 6) {
         $query = "
             SELECT 
@@ -104,7 +102,7 @@ class AnalyticsService {
         return $stmt->fetchAll();
     }
     
-    // 5. Pola per hari
+    // Pola per hari
     public function getDayPattern($months = 6) {
         $query = "
             SELECT 
@@ -121,9 +119,7 @@ class AnalyticsService {
         return $stmt->fetchAll();
     }
     
-    // 6. Pola korelasi kategori & waktu (utamanya untuk admin) - DIPERBAIKI
     public function getCorrelationPattern($months = 6, $limit = 15) {
-        // Cast limit ke integer dan validasi
         $limit_val = (int)$limit;
         if ($limit_val <= 0) {
             $limit_val = 15;
@@ -149,12 +145,11 @@ class AnalyticsService {
         return $stmt->fetchAll();
     }
     
-    // 7. Jam puncak
     public function getPeakHour($months = 6) {
         $hour_pattern = $this->getHourPattern($months);
         
         if (empty($hour_pattern)) {
-            return 14; // Default jika tidak ada data
+            return 14; 
         }
         
         $peak_hour = 0;
@@ -170,12 +165,11 @@ class AnalyticsService {
         return $peak_hour;
     }
     
-    // 8. Hari puncak
     public function getPeakDay($months = 6) {
         $day_pattern = $this->getDayPattern($months);
         
         if (empty($day_pattern)) {
-            return 'Wednesday'; // Default jika tidak ada data
+            return 'Wednesday'; 
         }
         
         $peak_day = '';
@@ -191,7 +185,6 @@ class AnalyticsService {
         return $peak_day;
     }
     
-    // ================ METHOD KHUSUS UNTUK MASING-MASING ROLE ================
     
     // Data untuk mahasiswa
     public function getMahasiswaAnalytics($months = 6) {
@@ -245,7 +238,7 @@ class AnalyticsService {
         $data = $this->getAdminAnalytics($months);
         
         
-        unset($data['sensitive_info']); // jika ada
+        unset($data['sensitive_info']); 
         
         return $data;
 }

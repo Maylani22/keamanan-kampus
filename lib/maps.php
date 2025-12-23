@@ -18,18 +18,14 @@ class Maps {
             return self::getDefaultCoords();
         }
         
-        // Cache key
         $cacheKey = 'geocode_' . md5($address);
         
-        // Check cache first - menggunakan CacheService
         $cached = self::getCacheService()->get($cacheKey, 'osm');
         if ($cached !== false) {
             $cached['cached'] = true;
             $cached['source'] = 'cache';
             return $cached;
         }
-        
-        // ... sisa kode geocode OSM tetap ...
         
         if (!empty($data) && isset($data[0]['lat'])) {
             $result = [
@@ -41,7 +37,6 @@ class Maps {
                 'source' => 'openstreetmap'
             ];
             
-            // Save to cache - TTL lebih panjang untuk alamat statis
             self::getCacheService()->set($cacheKey, $result, 'osm', CACHE_TTL_LONG);
             
             return $result;
@@ -53,7 +48,6 @@ class Maps {
     public static function reverseGeocode($lat, $lng) {
         $cacheKey = 'reverse_' . md5("{$lat},{$lng}");
         
-        // Check cache
         $cached = self::getCacheService()->get($cacheKey, 'osm');
         if ($cached !== false) {
             $cached['cached'] = true;
@@ -70,7 +64,6 @@ class Maps {
                 'source' => 'openstreetmap'
             ];
             
-            // Save to cache
             self::getCacheService()->set($cacheKey, $result, 'osm', CACHE_TTL_LONG);
             
             return $result;
@@ -96,7 +89,6 @@ class Maps {
             }
         }
         
-        // Fetch from Mapbox
         $url = "https://api.mapbox.com/styles/v1/" . MAPBOX_STYLE . "/tiles/256/{$zoom}/{$x}/{$y}?access_token=" . MAPBOX_TOKEN;
         
         $ch = curl_init();
@@ -131,7 +123,6 @@ class Maps {
         
         $cacheKey = "directions_{$profile}_" . md5("{$fromLat},{$fromLng},{$toLat},{$toLng}");
         
-        // Check cache
         $cached = self::getCacheService()->get($cacheKey, 'mapbox');
         if ($cached !== false) {
             return $cached;
@@ -151,7 +142,6 @@ class Maps {
         if ($httpCode === 200) {
             $data = json_decode($response, true);
             
-            // Save to cache (TTL pendek karena traffic bisa berubah)
             self::getCacheService()->set($cacheKey, $data, 'mapbox', CACHE_TTL_SHORT);
             
             return $data;

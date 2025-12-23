@@ -12,17 +12,14 @@ class Auth {
         $this->userModel = new User($this->db);
     }
 
-    // Check if user is logged in
     public function isLoggedIn() {
         return isset($_SESSION['user_id']);
     }
 
-    // Check if user is admin
     public function isAdmin() {
         return isset($_SESSION['user_role']) && $_SESSION['user_role'] === ROLE_ADMIN;
     }
 
-    // Get current user data
     public function getCurrentUser() {
         if ($this->isLoggedIn()) {
             return [
@@ -35,7 +32,6 @@ class Auth {
         return null;
     }
 
-    // Login function
     public function login($email, $password) {
         $user = $this->userModel->getByEmail($email);
         
@@ -49,14 +45,11 @@ class Auth {
         return false;
     }
 
-    // Register function
     public function register($name, $email, $password, $role = ROLE_MAHASISWA) {
-        // Check if email exists
         if ($this->userModel->getByEmail($email)) {
             return ['error' => 'Email sudah terdaftar'];
         }
 
-        // Create new user
         $this->userModel->name = $name;
         $this->userModel->email = $email;
         $this->userModel->password = password_hash($password, PASSWORD_DEFAULT);
@@ -69,13 +62,11 @@ class Auth {
         return ['error' => 'Gagal mendaftar'];
     }
 
-    // Logout
     public function logout() {
         session_destroy();
     }
 }
 
-// Helper functions
 function checkLogin() {
     $auth = new Auth();
     if (!$auth->isLoggedIn()) {

@@ -101,7 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// DATA
 if ($action === 'view') {
     if (isset($_GET['id'])) {
         $laporan = $laporanModel->getById($_GET['id']);
@@ -135,7 +134,6 @@ if ($action === 'view') {
             background-color: rgba(0, 0, 0, 0.02);
         }
         
-        /* Styling untuk peta di view */
         #viewMap {
             height: 300px;
             border-radius: 8px;
@@ -179,7 +177,6 @@ if ($action === 'view') {
             }
         }
 
-        /* ========== NAVBAR STYLES ========== */
         .navbar-custom {
             background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -332,7 +329,7 @@ if ($action === 'view') {
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="dashboard_admin.php"> <!-- PERBAIKAN: dashboard_admin.php -->
+            <a class="navbar-brand" href="dashboard_admin.php"> 
                 <i class="bi bi-shield-check"></i>
                 <span class="logo-text">Sistem Keamanan Kampus</span>
             </a>
@@ -349,7 +346,7 @@ if ($action === 'view') {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="laporan_admin.php"> <!-- PERBAIKAN: laporan_admin.php -->
+                        <a class="nav-link active" href="laporan_admin.php">
                             <i class="bi bi-file-text"></i> Laporan
                         </a>
                     </li>
@@ -441,7 +438,6 @@ if ($action === 'view') {
                                     </div>
                                 </div>
 
-                                <!-- Form Input-->
                                 <div class="mb-3">
                                     <label class="form-label">Judul Laporan</label>
                                     <div class="form-control-plaintext border rounded p-2 bg-light">
@@ -491,13 +487,11 @@ if ($action === 'view') {
                             </div>
                             
                             <div class="col-md-4">
-                                <!-- Peta -->
                                 <div class="card mb-3">
                                     <div class="card-header">
                                         <h6 class="mb-0"><i class="bi bi-map"></i> Peta Lokasi</h6>
                                     </div>
                                     <div class="card-body p-0 map-container">
-                                        <!-- Loading State -->
                                         <div class="location-loading active" id="viewMapLoading">
                                             <div class="text-center py-5">
                                                 <div class="spinner-border text-primary mb-3" role="status"></div>
@@ -505,7 +499,6 @@ if ($action === 'view') {
                                             </div>
                                         </div>
                                         
-                                        <!-- PERBAIKAN: Gunakan data dari $laporan, bukan $editLaporan -->
                                         <div id="viewMap" 
                                             data-lat="<?= !empty($laporan['latitude']) ? floatval($laporan['latitude']) : '' ?>" 
                                             data-lng="<?= !empty($laporan['longitude']) ? floatval($laporan['longitude']) : '' ?>" 
@@ -580,7 +573,6 @@ if ($action === 'view') {
             </div>
 
         <?php else: ?>
-            <!-- List/Tabel Laporan -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
@@ -597,7 +589,6 @@ if ($action === 'view') {
                 </div>
                 <div class="card-body">
                     <?php if (empty($laporans)): ?>
-                        <!-- Empty State Message -->
                         <div class="text-center py-5">
                             <i class="bi bi-clipboard-x display-1 text-muted mb-3"></i>
                             <h4 class="text-muted">Belum ada laporan</h4>
@@ -660,7 +651,6 @@ if ($action === 'view') {
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <!-- Quick Status Update (Admin) di tabel -->
                                             <form method="POST" class="d-inline">
                                                 <input type="hidden" name="update_status" value="1">
                                                 <input type="hidden" name="id" value="<?= $laporan['id'] ?>">
@@ -718,7 +708,6 @@ if ($action === 'view') {
         <?php endif; ?>
     </div>
 
-    <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -745,7 +734,6 @@ if ($action === 'view') {
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         window.MAPBOX_TOKEN = '<?= MAPBOX_TOKEN ?>';

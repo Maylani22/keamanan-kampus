@@ -6,13 +6,11 @@ $error = '';
 $success = '';
 $email = $_SESSION['reset_email'] ?? '';
 
-// Cek apakah OTP sudah diverifikasi
 if (empty($email) || !isset($_SESSION['otp_verified']) || $_SESSION['otp_verified'] !== true) {
     header('Location: login.php');
     exit;
 }
 
-// Koneksi database untuk update password
 function getDBConnection() {
     try {
         $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
@@ -38,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = getDBConnection();
             
-            // Update password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $updateStmt = $pdo->prepare("UPDATE users SET password = ? WHERE email = ?");
             $result = $updateStmt->execute([$hashed_password, $email]);
@@ -46,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($result) {
                 $success = 'Password berhasil direset! Silakan login dengan password baru.';
                 
-                // Hapus session reset
                 unset(
                     $_SESSION['reset_otp'],
                     $_SESSION['reset_email'], 

@@ -1,5 +1,4 @@
 <?php
-// lib/EmailService.php
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -16,7 +15,7 @@ class EmailService {
     
     private function configure() {
         try {
-            // Konfigurasi SMTP
+
             $this->mail->isSMTP();
             $this->mail->Host       = SMTP_HOST;
             $this->mail->SMTPAuth   = true;
@@ -25,9 +24,7 @@ class EmailService {
             $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $this->mail->Port       = SMTP_PORT;
             
-            // Aktifkan debugging
-            $this->mail->SMTPDebug = 2; // Level 2 untuk verbose output
-            // Simpan debug output ke variabel
+            $this->mail->SMTPDebug = 2; 
             $this->mail->Debugoutput = function($str, $level) {
                 error_log("PHPMailer debug level $level: $str");
             };
@@ -51,15 +48,13 @@ class EmailService {
             $html = $this->getOTPEmailTemplate($otp, $expiryMinutes, $toName);
             $this->mail->Body = $html;
             
-            // Text alternative
             $text = "Halo $toName,\n\n"
                   . "Kode OTP Anda: $otp\n"
                   . "Berlaku hingga: " . date('H:i', time() + ($expiryMinutes * 60)) . "\n\n"
                   . "Jangan bagikan kode ini kepada siapapun.\n\n"
                   . "Salam,\n" . SITE_NAME;
             $this->mail->AltBody = $text;
-            
-            // Kirim email
+        
             $this->mail->send();
             error_log("Email OTP berhasil dikirim ke: $toEmail");
             return true;

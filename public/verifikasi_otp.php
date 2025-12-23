@@ -1,13 +1,11 @@
 <?php
 
-
 require_once '../config/constants.php';
 
 $error = '';
 $success = '';
 $email = $_SESSION['reset_email'] ?? '';
 
-// Redirect jika tidak ada OTP yang sedang diproses
 if (empty($email)) {
     header('Location: login.php');
     exit;
@@ -21,18 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!preg_match('/^\d{6}$/', $otp)) {
         $error = 'Kode OTP harus 6 digit angka';
     } else {
-        // Ambil OTP dari session
+   
         $session_otp = $_SESSION['reset_otp'] ?? '';
-        $expires = $_SESSION['reset_otp_expires'] ?? 0; // DIUBAH: reset_otp_expires bukan reset_expires
-        
-        // Cek apakah OTP masih berlaku
+        $expires = $_SESSION['reset_otp_expires'] ?? 0;
+     
         if (time() > $expires) {
             $error = 'Kode OTP sudah kadaluarsa. Silakan request ulang.';
             unset($_SESSION['reset_otp'], $_SESSION['reset_email'], $_SESSION['reset_otp_expires']);
         } elseif ($session_otp != $otp) {
             $error = 'Kode OTP salah. Silakan coba lagi.';
         } else {
-            // OTP valid, set session untuk reset password
             $_SESSION['otp_verified'] = true;
             header('Location: reset_password.php');
             exit;
@@ -136,17 +132,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
-        // Auto-focus ke input OTP
         document.querySelector('.otp-input').focus();
         
-        // Auto submit form jika OTP sudah 6 digit
         document.querySelector('.otp-input').addEventListener('input', function() {
             if (this.value.length === 6) {
                 this.form.submit();
             }
         });
         
-        // Validasi hanya angka
         document.querySelector('.otp-input').addEventListener('keypress', function(e) {
             if (!/[0-9]/.test(e.key)) {
                 e.preventDefault();

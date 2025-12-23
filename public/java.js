@@ -15,7 +15,6 @@ function initFreeMap() {
     
     liveMap = L.map('liveMap').setView([defaultLat, defaultLng], 15);
     
-    // Gunakan Mapbox tile layer
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19,
@@ -121,7 +120,6 @@ function detectUserLocation() {
     );
 }
 
-// Update map with user location
 function updateMapWithLocation(lat, lng, accuracy) {
     if (!liveMap) return;
     
@@ -157,7 +155,6 @@ function updateMapWithLocation(lat, lng, accuracy) {
     `).openPopup();
 }
 
-// Get address from coordinates
 function getFreeAddress(lat, lng) {
     const status = document.getElementById('locationStatus');
     const addressInput = document.getElementById('locationInput');
@@ -201,7 +198,6 @@ function getFreeAddress(lat, lng) {
     });
 }
 
-// Update location info display
 function updateLocationInfo(lat, lng, accuracy) {
     const coordInfo = document.getElementById('coordinatesInfo');
     const accInfo = document.getElementById('accuracyInfo');
@@ -221,7 +217,6 @@ function updateLocationInfo(lat, lng, accuracy) {
     }
 }
 
-// Start watching location
 function startWatchingLocation() {
     if (watchId) navigator.geolocation.clearWatch(watchId);
     
@@ -247,7 +242,6 @@ function startWatchingLocation() {
     );
 }
 
-// Clear location
 function clearLocation() {
     if (userMarker) liveMap.removeLayer(userMarker);
     if (accuracyCircle) liveMap.removeLayer(accuracyCircle);
@@ -281,7 +275,6 @@ function setupMapControls() {
         if (userMarker) {
             liveMap.setView(userMarker.getLatLng(), liveMap.getZoom());
         } else {
-            // Ambil data kampus dari atribut data
             const mapElement = document.getElementById('liveMap');
             const campusLat = parseFloat(mapElement.dataset.campusLat);
             const campusLng = parseFloat(mapElement.dataset.campusLng);
@@ -317,8 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const mapElement = document.getElementById('viewMap');
     if (!mapElement) {
-        // console.warn('Elemen viewMap tidak ditemukan');
-        return; // Silent return, tidak perlu warning
+        return; 
     }
     
     const latStr = mapElement.dataset.lat;
@@ -350,10 +342,8 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingElement.classList.add('active');
     }
     
-    // Gunakan global variable, tidak deklarasi ulang dengan const
     viewMap = L.map('viewMap').setView([lat, lng], 16);
     
-    // Gunakan token dari PHP atau default
     const accessToken = window.MAPBOX_TOKEN || 'pk.eyJ1IjoibXlsaTIyIiwiYSI6ImNtamVxcm83ZTBlN2wzZXM2ODV6aWF1OWoifQ.B57iu8W4s81qv4UxcemVPw';
     
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -390,7 +380,6 @@ document.addEventListener('DOMContentLoaded', function() {
         radius: 30
     }).addTo(viewMap);
     
-    // Pastikan peta di-resize setelah dimuat
     setTimeout(() => {
         if (viewMap) {
             viewMap.invalidateSize();
@@ -400,7 +389,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
     
-    // Fungsi helper
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
@@ -408,7 +396,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Fungsi untuk inisialisasi view map di laporan_admin
 function initAdminViewMap(mapElement) {
     const loadingElement = document.getElementById('viewMapLoading');
     if (loadingElement) {
@@ -438,7 +425,6 @@ function initAdminViewMap(mapElement) {
     
     const adminViewMap = L.map('mapView').setView([centerLat, centerLng], zoom);
     
-    // Gunakan Mapbox tile layer
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19,

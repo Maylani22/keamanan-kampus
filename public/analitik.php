@@ -19,7 +19,7 @@ $db = $database->connect();
 $laporanModel = new Laporan($db);
 
 $AnalyticsService = new AnalyticsService($db);
-$analyticsData = $AnalyticsService->getAdminAnalytics(12); // 12 bulan data
+$analyticsData = $AnalyticsService->getAdminAnalytics(12); 
 
 $monthlyData = $analyticsData['monthly'] ?? [];
 $hotspots = $analyticsData['hotspots'] ?? [];
@@ -42,16 +42,14 @@ foreach (array_reverse($monthlyData) as $data) {
     $counts[] = $data['jumlah'] ?? $data['count'] ?? 0;
 }
 
-// Fungsi konversi jam dari format HHMM (300, 1400) ke 0-23
 function convertHourFromHHMM($hourValue) {
     $hourValue = intval($hourValue);
     if ($hourValue >= 100) {
-        return floor($hourValue / 100); // 300 -> 3, 1400 -> 14
+        return floor($hourValue / 100); 
     }
     return $hourValue;
 }
 
-// mapping untuk hotspot data
 foreach ($hotspots as &$spot) {
     $spot['location_address'] = $spot['lokasi'] ?? '';
     $spot['kategori'] = $spot['kategori'] ?? '';
@@ -79,13 +77,10 @@ if (isset($_GET['export']) && $_GET['export'] == 'csv_all') {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="analitik_keamanan_' . date('Y-m-d') . '.csv"');
     
-    // Buat output stream
     $output = fopen('php://output', 'w');
-    
-    // Tambah BOM untuk UTF-8
     fputs($output, "\xEF\xBB\xBF");
     
-    // 1. DATA FREKUENSI BULANAN
+    // DATA FREKUENSI BULANAN
     fputcsv($output, ['FREKUENSI INSIDEN PER BULAN']);
     fputcsv($output, ['Bulan', 'Tahun', 'Label Bulan', 'Jumlah Insiden']);
     foreach ($monthlyData as $data) {
@@ -98,7 +93,7 @@ if (isset($_GET['export']) && $_GET['export'] == 'csv_all') {
     }
     fputcsv($output, []);
     
-    // 2. DATA AREA RAWAN (HOTSPOTS)
+    // DATA AREA RAWAN
     fputcsv($output, ['10 AREA RAWAN TERATAS']);
     fputcsv($output, ['Lokasi', 'Kategori', 'Frekuensi', 'Persentase Selesai (%)']);
     foreach ($hotspots as $spot) {
@@ -169,7 +164,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             padding-top: 70px;
         }
-        /* ========== NAVBAR STYLES ========== */
         .navbar-custom {
             background: linear-gradient(135deg, #2c3e50 0%, #1a2530 100%);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -509,7 +503,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
     <?php endif; ?>
 
     <div class="container mt-4">
-        <!-- HEADER -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="mb-1">
@@ -536,9 +529,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             </div>
         </div>
 
-        <!-- ROW 1: GRAFIK FREKUENSI & POLA KORELASI -->
         <div class="row mb-4">
-            <!-- GRAFIK FREKUENSI -->
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -574,7 +565,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
                 </div>
             </div>
             
-            <!-- POLA KORELASI -->
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -662,9 +652,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             </div>
         </div>
 
-        <!-- ROW 2: AREA RAWAN & POLA WAKTU -->
         <div class="row">
-            <!-- AREA RAWAN -->
             <div class="col-lg-6 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -759,7 +747,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
                         </div>
                     </div>
                     <div class="card-body">
-                        <!-- GRAFIK PER JAM (Default Tampil) -->
                         <div id="hourChartContainer">
                             <div class="chart-container">
                                 <canvas id="hourChart"></canvas>
@@ -784,7 +771,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
                             </div>
                         </div>
                         
-                        <!-- GRAFIK PER HARI (Awalnya Tersembunyi) -->
                         <div id="dayChartContainer" style="display: none;">
                             <div class="chart-container">
                                 <canvas id="dayChart"></canvas>
@@ -819,7 +805,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
     
     
     <script>
-        // 1. GRAFIK FREKUENSI BULANAN
         const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
         const monthlyChart = new Chart(monthlyCtx, {
             type: 'bar',
@@ -861,7 +846,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             }
         });
 
-        // 2. GRAFIK POLA JAM
         const hourCtx = document.getElementById('hourChart').getContext('2d');
         const hourChart = new Chart(hourCtx, {
             type: 'line',
@@ -891,7 +875,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             }
         });
 
-        // 3. GRAFIK POLA HARI
         const dayCtx = document.getElementById('dayChart').getContext('2d');
         const dayChart = new Chart(dayCtx, {
             type: 'bar',
@@ -918,7 +901,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             }
         });
 
-        // EXPORT FUNCTION - Hanya untuk admin
         function saveChart() {
             <?php if ($isAdmin): ?>
             const link = document.createElement('a');
@@ -930,9 +912,7 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             <?php endif; ?>
         }
 
-        // Initialize tabs dan auto-hide alert
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-hide alert setelah 5 detik
             const alert = document.querySelector('.alert');
             if (alert) {
                 setTimeout(() => {
@@ -942,9 +922,9 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             }
         });
     </script>
-    // Tambahkan script ini sebelum </body>
+
     <script>
-    // Fungsi untuk switch antara grafik Jam dan Hari
+
     document.addEventListener('DOMContentLoaded', function() {
         const showHourBtn = document.getElementById('showHourChart');
         const showDayBtn = document.getElementById('showDayChart');
@@ -952,7 +932,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
         const dayContainer = document.getElementById('dayChartContainer');
         
         if (showHourBtn && showDayBtn) {
-            // Tombol Per Jam
             showHourBtn.addEventListener('click', function() {
                 hourContainer.style.display = 'block';
                 dayContainer.style.display = 'none';
@@ -960,7 +939,6 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
                 showDayBtn.classList.remove('active');
             });
             
-            // Tombol Per Hari
             showDayBtn.addEventListener('click', function() {
                 hourContainer.style.display = 'none';
                 dayContainer.style.display = 'block';
@@ -968,14 +946,11 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
                 showHourBtn.classList.remove('active');
             });
             
-            // Inisialisasi tab pertama aktif
             showHourBtn.classList.add('active');
         }
         
-        // Cek apakah ada data untuk grafik hari
         const dayData = <?= json_encode(array_column($dayPattern, 'jumlah')) ?>;
         if (!dayData || dayData.length === 0) {
-            // Jika tidak ada data hari, nonaktifkan tombol hari
             if (showDayBtn) {
                 showDayBtn.disabled = true;
                 showDayBtn.innerHTML = '<i class="bi bi-calendar-week me-1"></i> Per Hari <span class="badge bg-secondary">No Data</span>';
@@ -983,10 +958,8 @@ if (isset($_GET['error']) && $_GET['error'] == 'unauthorized') {
             }
         }
         
-        // Cek apakah ada data untuk grafik jam
         const hourData = <?= json_encode(array_column($hourPattern, 'jumlah')) ?>;
         if (!hourData || hourData.length === 0) {
-            // Jika tidak ada data jam, nonaktifkan tombol jam
             if (showHourBtn) {
                 showHourBtn.disabled = true;
                 showHourBtn.innerHTML = '<i class="bi bi-clock me-1"></i> Per Jam <span class="badge bg-secondary">No Data</span>';

@@ -328,7 +328,6 @@ $show_reset_form = isset($_POST['action']) && $_POST['action'] === 'reset_reques
                                 <button type="submit" class="btn btn-primary w-100">Login</button>
                             </div>
                             
-                            <!-- Lupa Password di kanan -->
                             <div class="forgot-password-wrapper">
                                 <a href="#" class="reset-link" id="showResetLink" onclick="showResetForm(); return false;">
                                     <i class="bi bi-question-circle me-1"></i> Lupa Password?

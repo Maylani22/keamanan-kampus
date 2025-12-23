@@ -16,7 +16,6 @@ $db = $database->connect();
 $auth = new Auth();
 $user = $auth->getCurrentUser();
 
-// Hanya mahasiswa yang bisa akses
 if ($auth->isAdmin()) {
     header('Location: laporan_admin.php');
     exit;
@@ -29,12 +28,10 @@ $action = $_GET['action'] ?? 'list';
 $message = '';
 $error = '';
 
-// Initialize Email Notifier
 $emailNotifier = new EmailNotif($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['create'])) {
-        // 📝 CREATE REPORT
         $laporanModel->user_id = $user['id'];
         $laporanModel->kategori_id = $_POST['kategori_id'];
         $laporanModel->title = $_POST['title'];
@@ -56,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = 'Laporan berhasil dibuat!';
             
             try {
-                // Notifikasi untuk pelapor
+
                 SimpleNotification::add(
                     $db,
                     $user['id'],
@@ -64,8 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "Laporan Anda '{$laporanModel->title}' telah berhasil dibuat dan sedang dalam proses review.",
                     $laporanModel->id
                 );
-        
-                // 🔔 NOTIFIKASI UNTUK SEMUA ADMIN
+
                 $stmt = $db->prepare("SELECT id FROM users WHERE role = ?");
                 $stmt->execute([ROLE_ADMIN]);
                 $admins = $stmt->fetchAll();
@@ -92,10 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     elseif (isset($_POST['update'])) {
-        // ✏️ UPDATE REPORT (Hanya laporan sendiri)
         $editLaporan = $laporanModel->getById($_POST['id']);
         
-        // Validasi kepemilikan
         if (!$editLaporan || $editLaporan['user_id'] != $user['id']) {
             $error = 'Anda tidak memiliki izin untuk mengedit laporan ini';
         } else {
@@ -104,9 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $laporanModel->title = $_POST['title'];
             $laporanModel->description = $_POST['description'];
             $laporanModel->location_address = $_POST['location_address'];
-            $laporanModel->status = $editLaporan['status']; // Status tidak bisa diubah oleh mahasiswa
+            $laporanModel->status = $editLaporan['status'];
             
-            // Update coordinates if provided
             if (!empty($_POST['latitude']) && !empty($_POST['longitude'])) {
                 $laporanModel->latitude = $_POST['latitude'];
                 $laporanModel->longitude = $_POST['longitude'];
@@ -121,7 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     elseif (isset($_POST['delete'])) {
-        // 🗑️ DELETE REPORT (Hanya laporan sendiri)
         $report = $laporanModel->getById($_POST['id']);
         if (!$report || $report['user_id'] != $user['id']) {
             $error = 'Anda tidak memiliki izin';
@@ -136,7 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// 📊 GET DATA BERDASARKAN ROLE
 if ($action === 'create' || $action === 'edit' || $action === 'view') {
     $categories = $kategoriModel->getAll();
     if (($action === 'edit' || $action === 'view') && isset($_GET['id'])) {
@@ -145,7 +136,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
             $error = 'Laporan tidak ditemukan';
             $action = 'list';
         } elseif ($editLaporan['user_id'] != $user['id']) {
-            // Mahasiswa hanya bisa akses laporannya sendiri
             $error = 'Anda tidak memiliki izin';
             $action = 'list';
         }
@@ -164,7 +154,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
     <script src="java.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        /* Geolocation Peta Gratis */
         #liveMap, #viewMap {
             height: 350px;
             border-radius: 8px;
@@ -264,7 +253,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
             min-height: 38px;
         }
         
-        /* Responsive adjustments */
         @media (max-width: 768px) {
             #liveMap, #viewMap {
                 height: 250px;
@@ -478,7 +466,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
     </nav>
 
     <div class="container mt-4 pt-5">
-        <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>
                 <i class="bi bi-clipboard"></i> 
@@ -494,7 +481,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
             </div>
         </div>
 
-        <!-- Message Alerts -->
         <?php if ($message): ?>
             <div class="alert alert-success alert-dismissible fade show">
                 <i class="bi bi-check-circle me-2"></i>
@@ -511,9 +497,7 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
             </div>
         <?php endif; ?>
 
-        <!-- Main Content -->
         <?php if ($action === 'create' || $action === 'edit' || $action === 'view'): ?>
-            <!-- Form Create/Edit/View Laporan -->
             <div class="card <?= $action === 'view' ? 'view-mode' : '' ?>">
                 <div class="card-header">
                     <h5 class="mb-0">
@@ -529,10 +513,8 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                 </div>
                 <div class="card-body">
                     <?php if ($action === 'view'): ?>
-                        <!-- Mode View (Readonly) -->
                         <div id="laporanView">
                     <?php else: ?>
-                        <!-- Mode Create/Edit -->
                         <form method="POST" id="laporanForm">
                         <?php if ($action === 'create'): ?>
                             <input type="hidden" name="create" value="1">
@@ -553,7 +535,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
 
                         <div class="row">
                             <div class="col-md-8">
-                                <!-- Status Laporan (hanya untuk view) -->
                                 <?php if ($action === 'view'): ?>
                                     <div class="mb-3">
                                         <label class="form-label">Status Laporan</label>
@@ -569,7 +550,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                     </div>
                                 <?php endif; ?>
 
-                                <!-- Form Input -->
                                 <div class="mb-3">
                                     <label class="form-label">Judul Laporan <?= $action !== 'view' ? '*' : '' ?></label>
                                     <?php if ($action === 'view'): ?>
@@ -646,7 +626,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Informasi Tambahan (hanya view) -->
                                 <?php if ($action === 'view'): ?>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -670,7 +649,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                             </div>
                             
                             <div class="col-md-4">
-                                <!-- Live Map Container (hanya untuk create/edit) -->
                                 <?php if ($action !== 'view'): ?>
                                     <div class="card mb-3">
                                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -688,7 +666,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                             </div>
                                         </div>
                                         <div class="card-body p-0">
-                                            <!-- Loading State -->
                                             <div class="location-loading" id="mapLoading">
                                                 <div class="text-center py-5">
                                                     <div class="spinner-border text-primary mb-3" role="status"></div>
@@ -696,7 +673,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                                 </div>
                                             </div>
                                             
-                                            <!-- Map Container dengan data attributes -->
                                             <div id="liveMap" 
                                                  data-campus-lat="<?= CAMPUS_LAT ?>" 
                                                  data-campus-lng="<?= CAMPUS_LNG ?>"
@@ -704,7 +680,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                                  data-edit-lng="<?= isset($editLaporan['longitude']) ? $editLaporan['longitude'] : '' ?>">
                                             </div>
                                             
-                                            <!-- Location Info -->
                                             <div class="p-3 border-top">
                                                 <div class="row">
                                                     <div class="col-md-6">
@@ -741,7 +716,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                         </div>
                                     </div>
                                     
-                                    <!-- Location Controls (hanya untuk create/edit) -->
                                     <div class="location-controls mb-3">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
@@ -758,14 +732,12 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                         </div>
                                     </div>
                                 <?php else: ?>
-                                    <!-- Peta untuk view -->
                                     <div class="card mb-3">
                                         <div class="card-header">
                                             <h6 class="mb-0"><i class="bi bi-map"></i> Peta Lokasi</h6>
                                         </div>
                                         <div class="card-body p-0">
                                             <?php if (isset($editLaporan['latitude']) && isset($editLaporan['longitude'])): ?>
-                                                <!-- Loading State -->
                                                 <div class="location-loading" id="viewMapLoading">
                                                     <div class="text-center py-5">
                                                         <div class="spinner-border text-primary mb-3" role="status"></div>
@@ -773,14 +745,12 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                                     </div>
                                                 </div>
                                                 
-                                                <!-- Map Container untuk View dengan data attributes -->
                                                 <div id="viewMap" 
                                                     data-lat="<?= !empty($editLaporan['latitude']) ? floatval($editLaporan['latitude']) : '' ?>" 
                                                     data-lng="<?= !empty($editLaporan['longitude']) ? floatval($editLaporan['longitude']) : '' ?>" 
                                                     data-title="<?= htmlspecialchars($editLaporan['title'] ?? 'Laporan') ?>">
                                                 </div>
                                                 
-                                                <!-- Location Info -->
                                                 <div class="p-3 border-top">
                                                     <div class="row">
                                                         <div class="col-md-6">
@@ -814,7 +784,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
                             <div>
-                                <!-- Email Status Indicator -->
                                 <?php if (EMAIL_ENABLED): ?>
                                     <span class="email-status email-sent">
                                         <i class="bi bi-check-circle"></i> Email Notifikasi Aktif
@@ -827,12 +796,10 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                             </div>
                             <div>
                                 <?php if ($action === 'view'): ?>
-                                    <!-- Tombol kembali untuk view -->
                                     <a href="laporan_mahasiswa.php" class="btn btn-secondary">
                                         <i class="bi bi-arrow-left"></i> Kembali ke Daftar
                                     </a>
                                 <?php else: ?>
-                                    <!-- Tombol submit untuk create/edit -->
                                     <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-<?= $action === 'create' ? 'send' : 'save' ?>"></i>
                                         <?= $action === 'create' ? 'Kirim Laporan' : 'Simpan Perubahan' ?>
@@ -846,15 +813,14 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                         </div>
 
                     <?php if ($action === 'view'): ?>
-                        </div> <!-- End laporanView -->
+                        </div> 
                     <?php else: ?>
-                        </form> <!-- End laporanForm -->
+                        </form>
                     <?php endif; ?>
                 </div>
             </div>
 
         <?php else: ?>
-            <!-- List/Tabel Laporan -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
@@ -874,7 +840,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                 </div>
                 <div class="card-body">
                     <?php if (empty($laporans)): ?>
-                        <!-- Empty State Message -->
                         <div class="text-center py-5">
                             <i class="bi bi-clipboard-x display-1 text-muted mb-3"></i>
                             <h4 class="text-muted">Belum ada laporan</h4>
@@ -970,7 +935,7 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
             <?php endif; ?>
         </div>
 
-        <!-- Delete Confirmation Modal -->
+        <!-- Delete -->
         <div class="modal fade" id="deleteModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -1015,7 +980,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                 modal.show();
             }
             
-            // Form validation
             document.getElementById('laporanForm')?.addEventListener('submit', function(e) {
                 const location = document.getElementById('locationInput')?.value;
                 if (!location || location.trim().length < 5) {
@@ -1026,7 +990,6 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                 return true;
             });
             
-            // Auto-hide alerts after 5 seconds
             setTimeout(() => {
                 document.querySelectorAll('.alert').forEach(alert => {
                     const bsAlert = new bootstrap.Alert(alert);

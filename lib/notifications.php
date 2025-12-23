@@ -17,7 +17,6 @@ class SimpleNotification {
     
     public static function getUserNotifications($db, $user_id, $limit = 5) {
         try {
-            // Gunakan named parameter untuk menghindari LIMIT issue
             $stmt = $db->prepare("
                 SELECT * FROM notifikasi 
                 WHERE user_id = :user_id 
