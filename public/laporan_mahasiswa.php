@@ -45,8 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $laporanModel->longitude = $_POST['longitude'];
         } else {
             $coords = Maps::geocode($laporanModel->location_address);
-            $laporanModel->latitude = $coords['lat'];
-            $laporanModel->longitude = $coords['lng'];
+
+            if ($coords && isset($coords['lat'], $coords['lng'])) {
+                $laporanModel->latitude = $coords['lat'];
+                $laporanModel->longitude = $coords['lng'];
+            } else {
+                $laporanModel->latitude = null;
+                $laporanModel->longitude = null;
+            }
         }
         
         if ($laporanModel->create()) {
@@ -151,8 +157,7 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan - <?= SITE_NAME ?></title>
     <?php include 'header.php'; ?>
-    <script src="java.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <style>
         #liveMap, #viewMap {
             height: 350px;
@@ -737,7 +742,12 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
                                             <h6 class="mb-0"><i class="bi bi-map"></i> Peta Lokasi</h6>
                                         </div>
                                         <div class="card-body p-0">
-                                            <?php if (isset($editLaporan['latitude']) && isset($editLaporan['longitude'])): ?>
+                                            <?php if (
+                                                isset($editLaporan['latitude'], $editLaporan['longitude']) &&
+                                                is_numeric($editLaporan['latitude']) &&
+                                                is_numeric($editLaporan['longitude'])
+                                            ): ?>
+
                                                 <div class="location-loading" id="viewMapLoading">
                                                     <div class="text-center py-5">
                                                         <div class="spinner-border text-primary mb-3" role="status"></div>
@@ -959,13 +969,12 @@ if ($action === 'create' || $action === 'edit' || $action === 'view') {
         </div>
 
         <?php if ($action === 'create' || $action === 'edit' || $action === 'view'): ?>
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
             
             <script>
-                window.MAPBOX_TOKEN = '<?= MAPBOX_TOKEN ?>';
-                window.MAPBOX_STYLE = '<?= MAPBOX_STYLE ?>';
+                window.MAPBOX_TOKEN = "<?= MAPBOX_TOKEN ?>";
+                window.MAPBOX_STYLE = "<?= MAPBOX_STYLE ?>";
             </script>
-            
+            <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
             <script src="java.js"></script>
         <?php endif; ?>
 

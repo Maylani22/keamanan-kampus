@@ -121,7 +121,7 @@ if ($action === 'view') {
     <title>Laporan - <?= SITE_NAME ?></title>
     <?php include 'header.php'; ?>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <style>
         .status-select {
             min-width: 120px;
@@ -734,11 +734,11 @@ if ($action === 'view') {
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         window.MAPBOX_TOKEN = '<?= MAPBOX_TOKEN ?>';
         window.MAPBOX_STYLE = '<?= MAPBOX_STYLE ?>';
     </script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script src="java.js"></script>
 
     <script>

@@ -22,13 +22,18 @@ if ($auth->isLoggedIn()) {
 
 function getDBConnection() {
     try {
-        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $dsn = "mysql:host=" . DB_HOST .
+            ";port=" . DB_PORT .
+            ";dbname=" . DB_NAME .
+            ";charset=utf8mb4";
+
         $pdo = new PDO($dsn, DB_USER, DB_PASS);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     } catch (PDOException $e) {
         die("Koneksi database gagal: " . $e->getMessage());
     }
+
 }
 
 function checkRateLimit($email) {
@@ -104,8 +109,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $emailSent = $emailService->sendOTP($reset_email, $user['name'], $otp, 10);
                         
                         if ($emailSent) {
-                            // Tambahkan pesan sukses ke session
-                            $_SESSION['reset_success'] = 'Kode OTP telah dikirim ke email Anda. Silakan cek inbox atau spam folder.';
                             header('Location: verifikasi_otp.php');
                             exit;
                         } else {
@@ -115,20 +118,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                         
                     } catch (Exception $e) {
-                        $_SESSION['reset_error'] = 'Terjadi kesalahan sistem. Silakan coba lagi.';
+                        $_SESSION['reset_error'] = $e->getMessage(); 
                         error_log("EmailService error: " . $e->getMessage());
                         header('Location: login.php');
                         exit;
                     }
                     
                 } else {
-                    // EMAIL TIDAK TERDAFTAR - beri tahu pengguna
                     $_SESSION['reset_error'] = 'Email tidak terdaftar dalam sistem.';
                     header('Location: login.php');
                     exit;
                 }
             } catch (PDOException $e) {
-                $_SESSION['reset_error'] = 'Terjadi kesalahan sistem. Silakan coba lagi.';
+                $_SESSION['reset_error'] = $e->getMessage(); 
                 error_log("Reset password error: " . $e->getMessage());
                 header('Location: login.php');
                 exit;
@@ -161,10 +163,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $error = isset($_SESSION['login_error']) ? $_SESSION['login_error'] : '';
 $reset_error = isset($_SESSION['reset_error']) ? $_SESSION['reset_error'] : '';
 $reset_success = isset($_SESSION['reset_success']) ? $_SESSION['reset_success'] : '';
+$login_success = $_SESSION['login_success'] ?? '';
 
 unset($_SESSION['login_error']);
 unset($_SESSION['reset_error']);
 unset($_SESSION['reset_success']);
+unset($_SESSION['login_success']);
 
 $show_reset_form = isset($_POST['action']) && $_POST['action'] === 'reset_request';
 ?>
@@ -281,7 +285,14 @@ $show_reset_form = isset($_POST['action']) && $_POST['action'] === 'reset_reques
                         <small class="opacity-75">Sistem Pelaporan Keamanan Kampus</small>
                     </div>
                     <div class="login-body">
-                        
+                        <?php if ($login_success): ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <?= htmlspecialchars($login_success) ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <?php endif; ?>
+
                         <?php if ($error): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <i class="bi bi-exclamation-triangle me-2"></i>

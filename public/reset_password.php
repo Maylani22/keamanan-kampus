@@ -41,16 +41,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $updateStmt->execute([$hashed_password, $email]);
             
             if ($result) {
-                $success = 'Password berhasil direset! Silakan login dengan password baru.';
-                
+                $_SESSION['login_success'] = 'Password berhasil direset. Silakan login dengan password baru.';
+
                 unset(
                     $_SESSION['reset_otp'],
                     $_SESSION['reset_email'], 
-                    $_SESSION['reset_otp_expires'], // DIUBAH: reset_otp_expires bukan reset_expires
+                    $_SESSION['reset_otp_expires'],
                     $_SESSION['otp_verified']
                 );
-                
-                // Juga hapus rate limiting untuk email ini
+
                 if (isset($_SESSION['reset_attempts'])) {
                     $attempts = $_SESSION['reset_attempts'];
                     foreach ($attempts as $key => $attempt) {
@@ -60,9 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     $_SESSION['reset_attempts'] = $attempts;
                 }
-            } else {
-                $error = 'Gagal mereset password. Silakan coba lagi.';
+
+                header('Location: login.php');
+                exit;
             }
+
         } catch (PDOException $e) {
             $error = 'Terjadi kesalahan sistem. Silakan coba lagi.';
             error_log("Password reset error: " . $e->getMessage());

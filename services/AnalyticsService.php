@@ -11,21 +11,26 @@ class AnalyticsService {
     public function getMonthlyData($months = 6) {
         $query = "
             SELECT 
-                DATE_FORMAT(created_at, '%b %Y') as bulan_label,
-                DATE_FORMAT(created_at, '%Y-%m') as bulan,
-                COUNT(*) as jumlah
-            FROM laporan
-            WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? MONTH)
-            GROUP BY DATE_FORMAT(created_at, '%Y-%m'), DATE_FORMAT(created_at, '%b')
-            ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC
+                t.bulan,
+                t.bulan_label,
+                COUNT(*) AS jumlah
+            FROM (
+                SELECT 
+                    DATE(created_at) AS tanggal,
+                    DATE_FORMAT(created_at, '%Y-%m') AS bulan,
+                    DATE_FORMAT(created_at, '%b %Y') AS bulan_label
+                FROM laporan
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? MONTH)
+            ) t
+            GROUP BY t.bulan, t.bulan_label
+            ORDER BY t.bulan ASC
         ";
-        
+
         $stmt = $this->db->prepare($query);
         $stmt->execute([$months]);
         return $stmt->fetchAll();
     }
-    
-    // Area rawan/hotspots
+
     public function getHotspots($limit = 10, $months = null) {
         $where_clause = $months ? "WHERE l.created_at >= DATE_SUB(NOW(), INTERVAL ? MONTH)" : "";
         $params = $months ? [$months] : [];

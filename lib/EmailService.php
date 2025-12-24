@@ -1,5 +1,6 @@
 <?php
 
+require_once '../config/constants.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -34,8 +35,7 @@ class EmailService {
             $this->mail->CharSet = 'UTF-8';
             
         } catch (Exception $e) {
-            error_log("EmailService configuration error: " . $e->getMessage());
-            throw $e;
+           throw new Exception($this->mail->ErrorInfo ?: $e->getMessage());
         }
     }
     
